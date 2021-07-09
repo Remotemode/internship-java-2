@@ -28,8 +28,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public void loginUser(@RequestBody @NotNull LoginUserRequest loginUserRequest) {
+    public String loginUser(@RequestBody @NotNull LoginUserRequest loginUserRequest) {
         AuthHelper.checkAuthUserRequest(loginUserRequest);
-        authorizationService.loginUser(loginUserRequest);
+        return authorizationService.loginUser(loginUserRequest);
     }
 }

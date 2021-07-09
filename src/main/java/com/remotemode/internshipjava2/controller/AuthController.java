@@ -1,5 +1,6 @@
 package com.remotemode.internshipjava2.controller;
 
+import com.remotemode.internshipjava2.dto.LoginUserRequest;
 import com.remotemode.internshipjava2.dto.RegistrationUserRequest;
 import com.remotemode.internshipjava2.service.AuthorizationService;
 import com.remotemode.internshipjava2.util.AuthHelper;
@@ -24,5 +25,11 @@ public class AuthController {
     public void registerUser(@RequestBody @NotNull RegistrationUserRequest registrationUserRequest) {
         AuthHelper.checkRegistrationUserReguest(registrationUserRequest);
         authorizationService.registerUser(registrationUserRequest);
+    }
+
+    @PostMapping("/login")
+    public void loginUser(@RequestBody @NotNull LoginUserRequest loginUserRequest) {
+        AuthHelper.checkAuthUserRequest(loginUserRequest);
+        authorizationService.loginUser(loginUserRequest);
     }
 }

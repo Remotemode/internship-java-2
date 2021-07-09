@@ -1,5 +1,6 @@
 package com.remotemode.internshipjava2.service;
 
+import com.remotemode.internshipjava2.dto.LoginUserRequest;
 import com.remotemode.internshipjava2.dto.RegistrationUserRequest;
 import com.remotemode.internshipjava2.model.UserEntity;
 import com.remotemode.internshipjava2.repository.UserRepository;
@@ -21,5 +22,12 @@ public class AuthorizationService {
         UserEntity savedEntry = userRepository.save(userEntity);
 
         return savedEntry.getUserId();
+    }
+
+    public void loginUser(LoginUserRequest loginUserRequest) {
+        String login = loginUserRequest.getLogin();
+        String password = loginUserRequest.getPassword();
+
+        userRepository.findByLoginAndPassword(login, password);
     }
 }

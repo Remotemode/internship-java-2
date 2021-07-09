@@ -1,5 +1,6 @@
 package com.remotemode.internshipjava2.util;
 
+import com.remotemode.internshipjava2.dto.LoginUserRequest;
 import com.remotemode.internshipjava2.dto.RegistrationUserRequest;
 import com.remotemode.internshipjava2.exception.BadRequestException;
 
@@ -25,6 +26,18 @@ public class AuthHelper {
         }
         if (isNullOrBlank(lastName)) {
             throw new BadRequestException("LastName is missed");
+        }
+    }
+
+    public static void checkAuthUserRequest(LoginUserRequest loginUserRequest) {
+        String login = loginUserRequest.getLogin();
+        String password = loginUserRequest.getPassword();
+
+        if (isNullOrBlank(login)) {
+            throw new BadRequestException("Login is missed");
+        }
+        if (isNullOrBlank(password)) {
+            throw new BadRequestException("Password is missed");
         }
     }
 

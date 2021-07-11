@@ -15,6 +15,10 @@ public class JwtTokenCacheService {
         jwtTokenCache.put(jwtToken, jwtUser);
     }
 
+    public JwtUser getJwtUserByToken(String jwtToken) {
+        return jwtTokenCache.get(jwtToken);
+    }
+
     void removeToken(String jwtToken) {
         jwtTokenCache.remove(jwtToken);
     }

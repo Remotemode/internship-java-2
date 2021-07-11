@@ -2,6 +2,7 @@ package com.remotemode.internshipjava2.jwt;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.remotemode.internshipjava2.model.JwtUser;
+import com.remotemode.internshipjava2.service.JwtTokenCacheService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -18,11 +19,13 @@ import java.util.Objects;
 public class JwtFilter extends GenericFilterBean {
 
     private final JwtProvider jwtProvider;
+    private final JwtTokenCacheService jwtTokenCacheService;
 
     public static final String AUTHORIZATION = "Authorization";
 
-    public JwtFilter(JwtProvider jwtProvider) {
+    public JwtFilter(JwtProvider jwtProvider, JwtTokenCacheService jwtTokenCacheService) {
         this.jwtProvider = jwtProvider;
+        this.jwtTokenCacheService = jwtTokenCacheService;
     }
 
     @Override
@@ -58,19 +61,29 @@ public class JwtFilter extends GenericFilterBean {
     }
 
     private void checkIfJwtTokenIsPresent(String authorizationHeaderValue, HttpServletResponse httpResponse) throws IOException {
-        JwtUser userFromToken = getJwtUserFromToken(authorizationHeaderValue, httpResponse);
+        String jwtToken = authorizationHeaderValue.replace("Bearer ", "");
+        JwtUser userFromToken = getJwtUserFromToken(jwtToken, httpResponse);
+
         if (Objects.isNull(userFromToken)) {
             httpResponse.sendError(403, "Unknown jwtToken");
         }
+
+        checkIfJwtTokenPresentsInCache(jwtToken, httpResponse);
     }
 
-    private JwtUser getJwtUserFromToken(String authorizationHeaderValue, HttpServletResponse httpResponse) throws IOException {
-        String jwtToken = authorizationHeaderValue.replace("Bearer ", "");
+    private JwtUser getJwtUserFromToken(String jwtToken, HttpServletResponse httpResponse) throws IOException {
         try {
             return jwtProvider.getUserFromToken(jwtToken);
         } catch (JsonProcessingException e) {
             httpResponse.sendError(400, "Error of processing jwtToken to json");
             return null;
+        }
+    }
+
+    private void checkIfJwtTokenPresentsInCache(String jwtToken, HttpServletResponse httpResponse) throws IOException {
+        JwtUser jwtUser = jwtTokenCacheService.getJwtUserByToken(jwtToken);
+        if (Objects.isNull(jwtUser)) {
+            httpResponse.sendError(403, "Unknown jwtToken, doesn't exist in a system");
         }
     }
 }

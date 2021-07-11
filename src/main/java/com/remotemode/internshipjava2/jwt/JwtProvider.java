@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.remotemode.internshipjava2.exception.BadRequestException;
 import com.remotemode.internshipjava2.model.JwtUser;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,5 +28,11 @@ public class JwtProvider {
                 .setSubject(jsonSubject)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
+    }
+
+    public JwtUser getUserFromToken(String jwtToken) throws JsonProcessingException {
+        Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwtToken).getBody();
+        String subject = claims.getSubject();
+        return objectMapper.readValue(subject, JwtUser.class);
     }
 }

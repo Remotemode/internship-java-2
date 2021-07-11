@@ -43,7 +43,12 @@ public class JwtFilter extends GenericFilterBean {
             checkAuthorizationHeader(authorizationHeaderValue, httpResponse);
 
             if (Objects.nonNull(authorizationHeaderValue)) {
-                checkIfJwtTokenIsPresent(authorizationHeaderValue, httpResponse);
+                String jwtToken = authorizationHeaderValue.replace("Bearer ", "");
+
+                checkIfJwtTokenIsPresent(jwtToken, httpResponse);
+
+                JwtUser userFromToken = getJwtUserFromToken(jwtToken, httpResponse);
+                checkIsMethodAllowed(userFromToken, url, httpRequest, httpResponse);
             }
         }
 
@@ -84,6 +89,14 @@ public class JwtFilter extends GenericFilterBean {
         JwtUser jwtUser = jwtTokenCacheService.getJwtUserByToken(jwtToken);
         if (Objects.isNull(jwtUser)) {
             httpResponse.sendError(403, "Unknown jwtToken, doesn't exist in a system");
+        }
+    }
+
+    private void checkIsMethodAllowed(JwtUser jwtUser, String url, HttpServletRequest httpServletRequest, HttpServletResponse httpResponse)
+            throws IOException {
+
+        if (url.contains("/all") && !jwtUser.getRole().equals("ADMIN")) {
+            httpResponse.sendError(403, "Method not allowed!");
         }
     }
 }

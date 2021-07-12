@@ -57,11 +57,11 @@ public class JwtFilter extends GenericFilterBean {
 
     private void checkAuthorizationHeader(String authorizationHeaderValue, HttpServletResponse httpResponse) throws IOException {
         if (Objects.isNull(authorizationHeaderValue)) {
-            httpResponse.sendError(400, "Missing authorization header in HttpServletRequest");
+            httpResponse.sendError(401);
         }
 
         if (Objects.nonNull(authorizationHeaderValue) && !authorizationHeaderValue.contains("Bearer ")) {
-            httpResponse.sendError(400, "Incorrect authorization header");
+            httpResponse.sendError(401);
         }
     }
 
@@ -70,7 +70,7 @@ public class JwtFilter extends GenericFilterBean {
         JwtUser userFromToken = getJwtUserFromToken(jwtToken, httpResponse);
 
         if (Objects.isNull(userFromToken)) {
-            httpResponse.sendError(403, "Unknown jwtToken");
+            httpResponse.sendError(401);
         }
 
         checkIfJwtTokenPresentsInCache(jwtToken, httpResponse);
@@ -80,7 +80,7 @@ public class JwtFilter extends GenericFilterBean {
         try {
             return jwtProvider.getUserFromToken(jwtToken);
         } catch (JsonProcessingException e) {
-            httpResponse.sendError(400, "Error of processing jwtToken to json");
+            httpResponse.sendError(401);
             return null;
         }
     }
@@ -88,7 +88,7 @@ public class JwtFilter extends GenericFilterBean {
     private void checkIfJwtTokenPresentsInCache(String jwtToken, HttpServletResponse httpResponse) throws IOException {
         JwtUser jwtUser = jwtTokenCacheService.getJwtUserByToken(jwtToken);
         if (Objects.isNull(jwtUser)) {
-            httpResponse.sendError(403, "Unknown jwtToken, doesn't exist in a system");
+            httpResponse.sendError(401);
         }
     }
 

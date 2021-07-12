@@ -10,5 +10,5 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 public class ExchangeRates {
-    Map<String, Rate> rates;
+    private Map<String, Rate> rates;
 }

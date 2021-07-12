@@ -39,11 +39,16 @@ public class JwtFilter extends GenericFilterBean {
 
         String authorizationHeaderValue = httpRequest.getHeader(AUTHORIZATION);
 
-        if (url.contains("/user")) {
+        if (url.contains("/user") || url.contains("/logout")) {
             checkAuthorizationHeader(authorizationHeaderValue, httpResponse);
 
             if (Objects.nonNull(authorizationHeaderValue)) {
-                checkIfJwtTokenIsPresent(authorizationHeaderValue, httpResponse);
+                String jwtToken = authorizationHeaderValue.replace("Bearer ", "");
+
+                checkIfJwtTokenIsPresent(jwtToken, httpResponse);
+
+                JwtUser userFromToken = getJwtUserFromToken(jwtToken, httpResponse);
+                checkIsMethodAllowed(userFromToken, url, httpRequest, httpResponse);
             }
         }
 
@@ -84,6 +89,14 @@ public class JwtFilter extends GenericFilterBean {
         JwtUser jwtUser = jwtTokenCacheService.getJwtUserByToken(jwtToken);
         if (Objects.isNull(jwtUser)) {
             httpResponse.sendError(401);
+        }
+    }
+
+    private void checkIsMethodAllowed(JwtUser jwtUser, String url, HttpServletRequest httpServletRequest, HttpServletResponse httpResponse)
+            throws IOException {
+
+        if (url.contains("/all") && !jwtUser.getRole().equals("ADMIN")) {
+            httpResponse.sendError(403);
         }
     }
 }

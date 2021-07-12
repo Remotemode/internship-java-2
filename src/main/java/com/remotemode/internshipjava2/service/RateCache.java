@@ -25,7 +25,7 @@ public class RateCache {
         rateCache.put(rate.getName(), rateInfo);
     }
 
-    public void updateRateCache(Rate rate) {
+    private void updateRateCache(Rate rate) {
         RateInfo rateInfo = rateCache.get(rate.getName());
         rateInfo.setLastPrice(rate.getValue());
     }

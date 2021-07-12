@@ -4,11 +4,10 @@ import com.remotemode.internshipjava2.dto.LoginUserRequest;
 import com.remotemode.internshipjava2.dto.RegistrationUserRequest;
 import com.remotemode.internshipjava2.service.AuthorizationService;
 import com.remotemode.internshipjava2.util.AuthHelper;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
 @RestController
@@ -31,5 +30,14 @@ public class AuthController {
     public String loginUser(@RequestBody @NotNull LoginUserRequest loginUserRequest) {
         AuthHelper.checkAuthUserRequest(loginUserRequest);
         return authorizationService.loginUser(loginUserRequest);
+    }
+
+    @GetMapping("/logout")
+    public void logout(ServletRequest servletRequest) {
+        HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
+        String authorizationHeaderValue = httpRequest.getHeader("Authorization");
+        String jwtToken =  authorizationHeaderValue.replace("Bearer ", "");
+
+        authorizationService.logout(jwtToken);
     }
 }

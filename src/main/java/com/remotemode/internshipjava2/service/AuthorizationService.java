@@ -52,4 +52,8 @@ public class AuthorizationService {
             throw new BadRequestException("Incorrect login or password");
         }
     }
+
+    public void logout(String jwtToken) {
+        jwtTokenCacheService.removeToken(jwtToken);
+    }
 }

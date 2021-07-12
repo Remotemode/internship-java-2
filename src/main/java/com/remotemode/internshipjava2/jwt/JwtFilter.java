@@ -39,7 +39,7 @@ public class JwtFilter extends GenericFilterBean {
 
         String authorizationHeaderValue = httpRequest.getHeader(AUTHORIZATION);
 
-        if (url.contains("/user")) {
+        if (url.contains("/user") || url.contains("/logout")) {
             checkAuthorizationHeader(authorizationHeaderValue, httpResponse);
 
             if (Objects.nonNull(authorizationHeaderValue)) {
@@ -96,7 +96,7 @@ public class JwtFilter extends GenericFilterBean {
             throws IOException {
 
         if (url.contains("/all") && !jwtUser.getRole().equals("ADMIN")) {
-            httpResponse.sendError(403, "Method not allowed!");
+            httpResponse.sendError(403);
         }
     }
 }
